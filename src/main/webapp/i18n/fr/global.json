@@ -7,7 +7,13 @@
       "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
       "entities": {
         "main": "Entités",
-        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
+        "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
+        "rvpApilodging": "Rvp Apilodging",
+        "rvpApiResponse": "Rvp Api Response",
+        "rvpApiLodgingCqi": "Rvp Api Lodging Cqi",
+        "rvpApiGlobalReview": "Rvp Api Global Review",
+        "rvpApiLodgingScore": "Rvp Api Lodging Score",
+        "rvpApiSurvey": "Rvp Api Survey"
       },
       "account": {
         "main": "Compte",

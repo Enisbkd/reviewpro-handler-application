@@ -1,0 +1,31 @@
+{
+  "reviewproHandlerApplicationApp": {
+    "rvpApiLodgingCqi": {
+      "home": {
+        "title": "RvpApiLodgingCqis",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Rvp Api Lodging Cqi",
+        "createOrEditLabel": "Créer ou éditer un Rvp Api Lodging Cqi",
+        "notFound": "Aucun Rvp Api Lodging Cqi trouvé"
+      },
+      "created": "Un nouveau Rvp Api Lodging Cqi a été créé avec l'identifiant { param }",
+      "updated": "Le Rvp Api Lodging Cqi avec l'identifiant { param } a été mis à jour",
+      "deleted": "Le Rvp Api Lodging Cqi avec l'identifiant { param } a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Rvp Api Lodging Cqi { id } ?"
+      },
+      "detail": {
+        "title": "Rvp Api Lodging Cqi"
+      },
+      "id": "Id",
+      "lodgingId": "Lodging Id",
+      "averageCurrentPeriod": "Average Current Period",
+      "tendancy": "Tendancy",
+      "change": "Change",
+      "name": "Name",
+      "averagePreviousPeriod": "Average Previous Period",
+      "fd": "Fd",
+      "td": "Td"
+    }
+  }
+}
