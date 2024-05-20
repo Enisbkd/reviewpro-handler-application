@@ -1,0 +1,30 @@
+{
+  "reviewproHandlerApplicationApp": {
+    "rvpApiLodgingScore": {
+      "home": {
+        "title": "RvpApiLodgingScores",
+        "refreshListLabel": "Actualiser la liste",
+        "createLabel": "Créer un nouveau Rvp Api Lodging Score",
+        "createOrEditLabel": "Créer ou éditer un Rvp Api Lodging Score",
+        "notFound": "Aucun Rvp Api Lodging Score trouvé"
+      },
+      "created": "Un nouveau Rvp Api Lodging Score a été créé avec l'identifiant { param }",
+      "updated": "Le Rvp Api Lodging Score avec l'identifiant { param } a été mis à jour",
+      "deleted": "Le Rvp Api Lodging Score avec l'identifiant { param } a été supprimé",
+      "delete": {
+        "question": "Êtes-vous certain de vouloir supprimer le Rvp Api Lodging Score { id } ?"
+      },
+      "detail": {
+        "title": "Rvp Api Lodging Score"
+      },
+      "id": "Id",
+      "lodgingId": "Lodging Id",
+      "surveyId": "Survey Id",
+      "nps": "Nps",
+      "rating": "Rating",
+      "customScore": "Custom Score",
+      "fd": "Fd",
+      "td": "Td"
+    }
+  }
+}

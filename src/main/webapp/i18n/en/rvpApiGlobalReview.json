@@ -1,0 +1,29 @@
+{
+  "reviewproHandlerApplicationApp": {
+    "rvpApiGlobalReview": {
+      "home": {
+        "title": "Rvp Api Global Reviews",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Rvp Api Global Review",
+        "createOrEditLabel": "Create or edit a Rvp Api Global Review",
+        "notFound": "No Rvp Api Global Reviews found"
+      },
+      "created": "A new Rvp Api Global Review is created with identifier { param }",
+      "updated": "A Rvp Api Global Review is updated with identifier { param }",
+      "deleted": "A Rvp Api Global Review is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Rvp Api Global Review { id }?"
+      },
+      "detail": {
+        "title": "Rvp Api Global Review"
+      },
+      "id": "Id",
+      "lodgingid": "Lodgingid",
+      "prevGri": "Prev Gri",
+      "distribution": "Distribution",
+      "gri": "Gri",
+      "fd": "Fd",
+      "td": "Td"
+    }
+  }
+}

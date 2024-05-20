@@ -1,0 +1,39 @@
+{
+  "annotations": {
+    "changelogDate": "20240520202429"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "surveyId",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "lodgingId",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "date",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "overallsatsifaction",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "customScore",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "plantorevisit",
+      "fieldType": "Boolean"
+    }
+  ],
+  "name": "RvpApiResponse",
+  "relationships": [],
+  "searchEngine": "no"
+}
