@@ -158,7 +158,10 @@ dependencies {
     testImplementation "org.testcontainers:mongodb"
     testImplementation "org.testcontainers:testcontainers"
     implementation platform(libs.mongock.bom)
-    // jhipster-needle-gradle-dependency - JHipster will add additional dependencies here
+    implementation 'org.springframework.kafka:spring-kafka'
+    // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
+    implementation 'org.apache.httpcomponents:httpclient:4.5'
+
 }
 
 task cleanResources(type: Delete) {

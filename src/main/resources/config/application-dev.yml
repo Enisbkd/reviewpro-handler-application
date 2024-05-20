@@ -43,14 +43,26 @@ spring:
   thymeleaf:
     cache: false
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    security.protocol: 'PLAINTEXT'
+    sasl.mechanism: ''
+    sasl.jaas.config: ''
+    ssl.sslTruststoreLocation: ''
+    ssl.sslTruststorePassword: ''
+    topics:
+      client-topic: data-7rooms-client
+      reservation-topic: data-7rooms-reservation
+      venue-topic: data-7rooms-venue
+      venue-topic-deadletters: data-7rooms-venue-deadletters
+      handler-logs-topic: log-7rooms-handler
+      handler-deadletters-topic: data-7rooms-handler-deadletters
 server:
-  port: 1010
+  port: 2020
 
-# ===================================================================
-# JHipster specific properties
-#
-# Full reference is available at: https://www.jhipster.tech/common-application-properties/
-# ===================================================================
+reviewpro:
+  api.url: 'https://apm-dev0.sbm.interne/reviewpro/v1'
+  api.key: 519d622e-2d6f-4825-90bd-65b50de59f01
 
 jhipster:
   cache: # Cache configuration
@@ -60,7 +72,7 @@ jhipster:
   # CORS is only enabled by default with the "dev" profile
   cors:
     # Allow Ionic for JHipster by default (* no longer allowed in Spring Boot 2.4+)
-    allowed-origins: 'http://localhost:8100,https://localhost:8100,http://localhost:9000,https://localhost:9000,http://localhost:9060,https://localhost:9060'
+    allowed-origins: 'http://localhost:8100,https://localhost:8100,http://localhost:9000,https://localhost:9000,http://localhost:9060,https://localhost:9060,http://localhost:2020,https://localhost:2020'
     # Enable CORS when running in GitHub Codespaces
     allowed-origin-patterns: 'https://*.githubpreview.dev'
     allowed-methods: '*'
@@ -85,13 +97,3 @@ jhipster:
       host: localhost
       port: 5000
       ring-buffer-size: 512
-# ===================================================================
-# Application specific properties
-# Add your own application properties here, see the ApplicationProperties class
-# to have type-safe configuration, like in the JHipsterProperties above
-#
-# More documentation is available at:
-# https://www.jhipster.tech/common-application-properties/
-# ===================================================================
-
-# application:
