@@ -1,0 +1,43 @@
+{
+  "annotations": {
+    "changelogDate": "20240520201048"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "overallScoreEnabled",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "languages",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "outOf",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "actibe",
+      "fieldType": "Boolean"
+    },
+    {
+      "fieldName": "pids",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "primary",
+      "fieldType": "Boolean"
+    }
+  ],
+  "name": "RvpApiSurvey",
+  "relationships": [],
+  "searchEngine": "no"
+}

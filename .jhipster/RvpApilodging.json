@@ -1,0 +1,19 @@
+{
+  "annotations": {
+    "changelogDate": "20240520201043"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "ida",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    }
+  ],
+  "name": "RvpApilodging",
+  "relationships": [],
+  "searchEngine": "no"
+}
