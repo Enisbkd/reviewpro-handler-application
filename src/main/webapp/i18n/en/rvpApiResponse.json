@@ -1,0 +1,29 @@
+{
+  "reviewproHandlerApplicationApp": {
+    "rvpApiResponse": {
+      "home": {
+        "title": "Rvp Api Responses",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Rvp Api Response",
+        "createOrEditLabel": "Create or edit a Rvp Api Response",
+        "notFound": "No Rvp Api Responses found"
+      },
+      "created": "A new Rvp Api Response is created with identifier { param }",
+      "updated": "A Rvp Api Response is updated with identifier { param }",
+      "deleted": "A Rvp Api Response is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Rvp Api Response { id }?"
+      },
+      "detail": {
+        "title": "Rvp Api Response"
+      },
+      "id": "Id",
+      "surveyId": "Survey Id",
+      "lodgingId": "Lodging Id",
+      "date": "Date",
+      "overallsatsifaction": "Overallsatsifaction",
+      "customScore": "Custom Score",
+      "plantorevisit": "Plantorevisit"
+    }
+  }
+}
