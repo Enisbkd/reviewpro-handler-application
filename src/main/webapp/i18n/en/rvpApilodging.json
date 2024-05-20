@@ -1,0 +1,25 @@
+{
+  "reviewproHandlerApplicationApp": {
+    "rvpApilodging": {
+      "home": {
+        "title": "Rvp Apilodgings",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Rvp Apilodging",
+        "createOrEditLabel": "Create or edit a Rvp Apilodging",
+        "notFound": "No Rvp Apilodgings found"
+      },
+      "created": "A new Rvp Apilodging is created with identifier { param }",
+      "updated": "A Rvp Apilodging is updated with identifier { param }",
+      "deleted": "A Rvp Apilodging is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Rvp Apilodging { id }?"
+      },
+      "detail": {
+        "title": "Rvp Apilodging"
+      },
+      "id": "ID",
+      "ida": "Ida",
+      "name": "Name"
+    }
+  }
+}

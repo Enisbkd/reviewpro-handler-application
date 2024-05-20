@@ -1,0 +1,43 @@
+{
+  "annotations": {
+    "changelogDate": "20240520201047"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "lodgingId",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "surveyId",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "nps",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "rating",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "customScore",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "fd",
+      "fieldType": "LocalDate"
+    },
+    {
+      "fieldName": "td",
+      "fieldType": "LocalDate"
+    }
+  ],
+  "name": "RvpApiLodgingScore",
+  "relationships": [],
+  "searchEngine": "no"
+}

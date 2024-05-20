@@ -1,0 +1,30 @@
+{
+  "reviewproHandlerApplicationApp": {
+    "rvpApiSurvey": {
+      "home": {
+        "title": "Rvp Api Surveys",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Rvp Api Survey",
+        "createOrEditLabel": "Create or edit a Rvp Api Survey",
+        "notFound": "No Rvp Api Surveys found"
+      },
+      "created": "A new Rvp Api Survey is created with identifier { param }",
+      "updated": "A Rvp Api Survey is updated with identifier { param }",
+      "deleted": "A Rvp Api Survey is deleted with identifier { param }",
+      "delete": {
+        "question": "Are you sure you want to delete Rvp Api Survey { id }?"
+      },
+      "detail": {
+        "title": "Rvp Api Survey"
+      },
+      "id": "Id",
+      "overallScoreEnabled": "Overall Score Enabled",
+      "languages": "Languages",
+      "outOf": "Out Of",
+      "name": "Name",
+      "actibe": "Actibe",
+      "pids": "Pids",
+      "primary": "Primary"
+    }
+  }
+}
