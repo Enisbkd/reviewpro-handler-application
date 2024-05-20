@@ -1,0 +1,39 @@
+{
+  "annotations": {
+    "changelogDate": "20240520195050"
+  },
+  "applications": "*",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "lodgingid",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "prevGri",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "distribution",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "gri",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "fd",
+      "fieldType": "LocalDate"
+    },
+    {
+      "fieldName": "td",
+      "fieldType": "LocalDate"
+    }
+  ],
+  "name": "RvpApiGlobalReview",
+  "relationships": [],
+  "searchEngine": "no"
+}
