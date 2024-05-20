@@ -1,0 +1,48 @@
+{
+  "annotations": {
+    "changelogDate": "20240520200100"
+  },
+  "applications": "*",
+  "documentation": "not an ignored comment",
+  "fields": [
+    {
+      "fieldName": "id",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "lodgingId",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "averageCurrentPeriod",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "tendancy",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "change",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "name",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "averagePreviousPeriod",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "fd",
+      "fieldType": "LocalDate"
+    },
+    {
+      "fieldName": "td",
+      "fieldType": "LocalDate"
+    }
+  ],
+  "name": "RvpApiLodgingCqi",
+  "relationships": [],
+  "searchEngine": "no"
+}

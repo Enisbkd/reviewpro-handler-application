@@ -1,0 +1,63 @@
+
+entity Rvpapilodging {
+	ida Integer
+	name String
+}
+
+entity RvpApiResponse {
+	id Integer
+    surveyId Integer
+    lodgingId Integer
+    date Instant
+    overallsatsifaction Double
+    customScore Double
+    plantorevisit Boolean
+}
+
+// an ignored comment
+/** not an ignored comment */
+entity RvpApiLodgingCqi {
+	id Integer
+	lodgingId Integer
+	averageCurrentPeriod String
+	tendancy String
+    change String
+    name String
+    averagePreviousPeriod String
+    fd LocalDate
+    td LocalDate
+}
+
+entity RvpApiGlobalReview {
+	id Integer
+    lodgingid Integer
+    prevGri Double
+    distribution String
+    gri Double
+    fd LocalDate
+    td LocalDate
+}
+
+
+entity RvpApiLodgingScore {
+	id Integer
+    lodgingId Integer
+    surveyId Integer
+    nps Double
+    rating Double
+    customScore Double
+    fd LocalDate
+    td LocalDate
+}
+
+
+entity RvpApiSurvey {
+	id Integer
+    overallScoreEnabled Boolean
+    languages String
+    outOf Integer
+    name String
+    actibe Boolean
+    pids String
+    primary Boolean
+}
