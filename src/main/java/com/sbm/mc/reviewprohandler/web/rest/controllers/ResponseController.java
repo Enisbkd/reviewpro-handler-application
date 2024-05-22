@@ -51,37 +51,43 @@ public class ResponseController {
     }
 
     @GetMapping("/getResponsesByPid")
-    public List<String> getResponsesByPid(
+    public List<RvpApiResponse> getResponsesByPid(
         @RequestParam int pid,
         @RequestParam String fd,
         @RequestParam String td,
         @RequestParam String flagged,
         @RequestParam boolean onlyPublished,
-        @RequestParam String dateFieldString
+        @RequestParam String dateField
     ) {
-        List<String> globalReviewsByPid = new ArrayList<>();
         List<String> surveyIds = surveyService.extractSurveyIds();
+        List<RvpApiResponse> allPidResponses = new ArrayList<>();
         String response = null;
         for (String surveyId : surveyIds) {
             logger.info("**********************************************************************");
-            List<RvpApiResponse> responsesByPid = getSurveyResponses(surveyId, pid, fd, td, flagged, onlyPublished, dateFieldString);
+            List<RvpApiResponse> responses = getSurveyResponses(surveyId, pid, fd, td, flagged, onlyPublished, dateField);
             logger.info("Response for pid : " + pid + " on survey: " + surveyId + " :: " + response);
-            globalReviewsByPid.add(response);
+            allPidResponses.addAll(responses);
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
-        return globalReviewsByPid;
+        return allPidResponses;
     }
 
     @GetMapping("/getAllResponses")
-    public List<List<String>> getAllResponses(@RequestParam String fd, @RequestParam String td) {
-        List<List<String>> responses = new ArrayList<>();
+    public List<RvpApiResponse> getAllResponses(
+        @RequestParam String fd,
+        @RequestParam String td,
+        @RequestParam String flagged,
+        @RequestParam boolean onlyPublished,
+        @RequestParam String dateField
+    ) {
+        List<RvpApiResponse> responses = new ArrayList<>();
         List<String> logingIds = lodgingService.getLodgingIds();
         for (String logingId : logingIds) {
-            responses.add(getResponsesByPid(Integer.valueOf(logingId), fd, td, null, false, null));
+            responses.addAll(getResponsesByPid(Integer.parseInt(logingId), fd, td, flagged, onlyPublished, dateField));
         }
         return responses;
     }

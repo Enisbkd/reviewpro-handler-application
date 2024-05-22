@@ -1,5 +1,7 @@
 package com.sbm.mc.reviewprohandler.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -18,15 +20,18 @@ public class RvpApiLodgingCqi implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
+    @JsonIgnore
     private Integer id;
 
     @Field("lodging_id")
+    @JsonProperty("id")
     private Integer lodgingId;
 
-    @Field("average_current_period")
+    @Field("averageCurrentPeriod")
     private String averageCurrentPeriod;
 
     @Field("tendancy")
+    @JsonProperty("tendency")
     private String tendancy;
 
     @Field("change")
@@ -35,7 +40,7 @@ public class RvpApiLodgingCqi implements Serializable {
     @Field("name")
     private String name;
 
-    @Field("average_previous_period")
+    @Field("averagePreviousPeriod")
     private String averagePreviousPeriod;
 
     @Field("fd")

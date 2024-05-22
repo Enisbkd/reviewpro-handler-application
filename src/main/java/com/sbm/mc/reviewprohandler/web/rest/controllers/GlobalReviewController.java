@@ -46,9 +46,9 @@ public class GlobalReviewController {
         List<String> surveyIds = surveyService.extractSurveyIds();
         RvpApiGlobalReview review = null;
         for (String surveyId : surveyIds) {
-            logger.info("**********************************************************************");
+            logger.debug("**********************************************************************");
             review = globalReviewService.getGlobalReview(pid, fd, td);
-            logger.info("Review for pid : " + pid + " on survey: " + surveyId + " :: " + review);
+            logger.debug("Review for pid : " + pid + " on survey: " + surveyId + " :: " + review);
             globalReviewsByPid.add(review);
             try {
                 Thread.sleep(500);

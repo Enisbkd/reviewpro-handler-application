@@ -1,5 +1,11 @@
 package com.sbm.mc.reviewprohandler.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sbm.mc.reviewprohandler.domain.RvpApiLodgingCqi;
+import java.time.LocalDate;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,7 +31,7 @@ public class LodgingCqiService {
         this.restTemplate = restTemplate;
     }
 
-    public String getLodgingIndex(String pid, String fd, String td) {
+    public List<RvpApiLodgingCqi> getLodgingIndex(String pid, String fd, String td) {
         String urlTemplate = baseUrl + "/v1/lodging/index/cqi";
 
         String url = String.format("%s?pid=%s&fd=%s&td=%s", urlTemplate, pid, fd, td);
@@ -41,7 +47,7 @@ public class LodgingCqiService {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 logger.info("API call successful, status code: {}", response.getStatusCode());
-                return response.getBody();
+                return mapToLodgingCqi(response.getBody(), fd, td);
             } else {
                 logger.error("API call failed, status code: {}", response.getStatusCode());
                 throw new RuntimeException("Failed to fetch data from API");
@@ -50,5 +56,20 @@ public class LodgingCqiService {
             logger.error("Exception occurred while making API call", e);
             throw new RuntimeException("Exception occurred while making API call", e);
         }
+    }
+
+    public List<RvpApiLodgingCqi> mapToLodgingCqi(String json, String fd, String td) {
+        ObjectMapper mapper = new ObjectMapper();
+        List<RvpApiLodgingCqi> lodgingsCqi = null;
+        try {
+            lodgingsCqi = mapper.readValue(json, new TypeReference<List<RvpApiLodgingCqi>>() {});
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        for (RvpApiLodgingCqi rvpApiLodgingCqi : lodgingsCqi) {
+            rvpApiLodgingCqi.setFd(LocalDate.parse(fd));
+            rvpApiLodgingCqi.setTd(LocalDate.parse(td));
+        }
+        return lodgingsCqi;
     }
 }
