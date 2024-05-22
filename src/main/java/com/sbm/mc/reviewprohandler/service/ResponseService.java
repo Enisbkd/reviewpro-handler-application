@@ -1,5 +1,14 @@
 package com.sbm.mc.reviewprohandler.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.sbm.mc.reviewprohandler.domain.RvpApiResponse;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +39,7 @@ public class ResponseService {
     @Value("${reviewpro.api.key}")
     private String apiKey;
 
-    public String getSurveyResponses(
+    public List<RvpApiResponse> getSurveyResponses(
         String surveyId,
         int pid,
         String fromDate,
@@ -60,7 +69,8 @@ public class ResponseService {
             logger.info("Sending request to URL: {}", url);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
             logger.info("Received response with status code: {}", response.getStatusCode());
-            return response.getBody();
+            logger.info(response.getBody());
+            return buildResponseObjects(response.getBody());
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             logger.error("HTTP error occurred: {}", e.getStatusCode());
             logger.error("Error response body: {}", e.getResponseBodyAsString());
@@ -69,5 +79,43 @@ public class ResponseService {
             logger.error("An unexpected error occurred: {}", e.getMessage());
             throw e;
         }
+    }
+
+    public List<RvpApiResponse> buildResponseObjects(String jsonString) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<RvpApiResponse> responsesObjects = new ArrayList<>();
+
+        try {
+            JsonNode rootNode = objectMapper.readTree(jsonString);
+            ArrayNode responsesNode = (ArrayNode) rootNode.get("responses");
+
+            for (JsonNode responseNode : responsesNode) {
+                Long date = responseNode.get("date").asLong();
+                int productId = responseNode.get("productId").asInt();
+                double customScoreValue = responseNode.get("customScore").get("value").asDouble();
+
+                ArrayNode answersNode = (ArrayNode) responseNode.get("answers");
+                List<String> labels = Arrays.asList("Revisite Bay", "Revisite HH", "Revisite BH", "Revisite HP");
+
+                for (JsonNode answerNode : answersNode) {
+                    RvpApiResponse response = new RvpApiResponse();
+                    response.setDate(Instant.ofEpochMilli(date));
+                    response.setLodgingId(productId);
+                    response.setCustomScore(customScoreValue);
+                    response.setSurveyId(answerNode.get("id").asText());
+                    if (answerNode.get("label").asText().equalsIgnoreCase("Satisfaction globale")) {
+                        response.setOverallsatsifaction(answerNode.get("answer").asDouble());
+                    }
+                    if (labels.contains(answerNode.get("label").asText())) {
+                        response.setPlantorevisit(answerNode.get("answer").asText().equalsIgnoreCase("yes") ? true : false);
+                    }
+                    responsesObjects.add(response);
+                }
+            }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+        return responsesObjects;
     }
 }

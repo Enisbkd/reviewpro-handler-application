@@ -39,6 +39,10 @@ public class RvpApiLodgingScore implements Serializable {
     @Field("td")
     private LocalDate td;
 
+    public RvpApiLodgingScore(int pid, double prevGri, int[] distribution, double gri) {}
+
+    public RvpApiLodgingScore() {}
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
     public Integer getId() {

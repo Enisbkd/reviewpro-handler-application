@@ -15,11 +15,8 @@ public class RvpApiResponse implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    private Integer id;
-
     @Field("survey_id")
-    private Integer surveyId;
+    private String surveyId;
 
     @Field("lodging_id")
     private Integer lodgingId;
@@ -36,31 +33,16 @@ public class RvpApiResponse implements Serializable {
     @Field("plantorevisit")
     private Boolean plantorevisit;
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here
-
-    public Integer getId() {
-        return this.id;
-    }
-
-    public RvpApiResponse id(Integer id) {
-        this.setId(id);
-        return this;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getSurveyId() {
+    public String getSurveyId() {
         return this.surveyId;
     }
 
-    public RvpApiResponse surveyId(Integer surveyId) {
+    public RvpApiResponse surveyId(String surveyId) {
         this.setSurveyId(surveyId);
         return this;
     }
 
-    public void setSurveyId(Integer surveyId) {
+    public void setSurveyId(String surveyId) {
         this.surveyId = surveyId;
     }
 
@@ -132,17 +114,6 @@ public class RvpApiResponse implements Serializable {
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof RvpApiResponse)) {
-            return false;
-        }
-        return getId() != null && getId().equals(((RvpApiResponse) o).getId());
-    }
-
-    @Override
     public int hashCode() {
         // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
@@ -152,7 +123,6 @@ public class RvpApiResponse implements Serializable {
     @Override
     public String toString() {
         return "RvpApiResponse{" +
-            "id=" + getId() +
             ", surveyId=" + getSurveyId() +
             ", lodgingId=" + getLodgingId() +
             ", date='" + getDate() + "'" +

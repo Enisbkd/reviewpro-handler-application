@@ -291,16 +291,16 @@ public class UserService {
      * <p>
      * This is scheduled to get fired everyday, at 01:00 (am).
      */
-    @Scheduled(cron = "0 0 1 * * ?")
-    public void removeNotActivatedUsers() {
-        userRepository
-            .findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(Instant.now().minus(3, ChronoUnit.DAYS))
-            .forEach(user -> {
-                log.debug("Deleting not activated user {}", user.getLogin());
-                userRepository.delete(user);
-                this.clearUserCaches(user);
-            });
-    }
+    //    @Scheduled(cron = "0 0 1 * * ?")
+    //    public void removeNotActivatedUsers() {
+    //        userRepository
+    //            .findAllByActivatedIsFalseAndActivationKeyIsNotNullAndCreatedDateBefore(Instant.now().minus(3, ChronoUnit.DAYS))
+    //            .forEach(user -> {
+    //                log.debug("Deleting not activated user {}", user.getLogin());
+    //                userRepository.delete(user);
+    //                this.clearUserCaches(user);
+    //            });
+    //    }
 
     /**
      * Gets a list of all the authorities.

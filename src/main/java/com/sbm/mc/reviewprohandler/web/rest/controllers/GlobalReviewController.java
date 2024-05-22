@@ -1,6 +1,8 @@
 package com.sbm.mc.reviewprohandler.web.rest.controllers;
 
+import com.sbm.mc.reviewprohandler.domain.RvpApiGlobalReview;
 import com.sbm.mc.reviewprohandler.service.GlobalReviewService;
+import com.sbm.mc.reviewprohandler.service.LodgingScoreService;
 import com.sbm.mc.reviewprohandler.service.LodgingService;
 import com.sbm.mc.reviewprohandler.service.SurveyService;
 import java.util.ArrayList;
@@ -22,25 +24,30 @@ public class GlobalReviewController {
     private final SurveyService surveyService;
     private final LodgingService lodgingService;
 
-    public GlobalReviewController(GlobalReviewService globalReviewService, SurveyService surveyService, LodgingService lodgingService) {
+    public GlobalReviewController(
+        LodgingScoreService lodgingScoreService,
+        GlobalReviewService globalReviewService,
+        SurveyService surveyService,
+        LodgingService lodgingService
+    ) {
         this.globalReviewService = globalReviewService;
         this.surveyService = surveyService;
         this.lodgingService = lodgingService;
     }
 
     @GetMapping("/globalReview")
-    public String getNps(@RequestParam String surveyId, @RequestParam Long pid, @RequestParam String fd, @RequestParam String td) {
-        return globalReviewService.getGlobalReviewData(surveyId, pid, fd, td);
+    public RvpApiGlobalReview getNps(@RequestParam int pid, @RequestParam String fd, @RequestParam String td) {
+        return globalReviewService.getGlobalReview(pid, fd, td);
     }
 
     @GetMapping("/getAllGlobalReviewsByPid")
-    public List<String> getAllSurveysNpsByPid(@RequestParam Long pid, @RequestParam String fd, @RequestParam String td) {
-        List<String> globalReviewsByPid = new ArrayList<>();
+    public List<RvpApiGlobalReview> getAllSurveysNpsByPid(@RequestParam int pid, @RequestParam String fd, @RequestParam String td) {
+        List<RvpApiGlobalReview> globalReviewsByPid = new ArrayList<>();
         List<String> surveyIds = surveyService.extractSurveyIds();
-        String review = null;
+        RvpApiGlobalReview review = null;
         for (String surveyId : surveyIds) {
             logger.info("**********************************************************************");
-            review = globalReviewService.getGlobalReviewData(surveyId, pid, fd, td);
+            review = globalReviewService.getGlobalReview(pid, fd, td);
             logger.info("Review for pid : " + pid + " on survey: " + surveyId + " :: " + review);
             globalReviewsByPid.add(review);
             try {
@@ -53,11 +60,11 @@ public class GlobalReviewController {
     }
 
     @GetMapping("/getAllGlobalReviews")
-    public List<List<String>> getAllSurveysNps(@RequestParam String fd, @RequestParam String td) {
-        List<List<String>> globalReviews = new ArrayList<>();
+    public List<List<RvpApiGlobalReview>> getAllSurveysNps(@RequestParam String fd, @RequestParam String td) {
+        List<List<RvpApiGlobalReview>> globalReviews = new ArrayList<>();
         List<String> logingIds = lodgingService.getLodgingIds();
         for (String logingId : logingIds) {
-            globalReviews.add(getAllSurveysNpsByPid(Long.valueOf(logingId), fd, td));
+            globalReviews.add(getAllSurveysNpsByPid(Math.toIntExact(Long.valueOf(logingId)), fd, td));
         }
         return globalReviews;
     }

@@ -1,5 +1,9 @@
 package com.sbm.mc.reviewprohandler.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sbm.mc.reviewprohandler.domain.RvpApilodging;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +35,8 @@ public class LodgingService {
     @Value("${reviewpro.api.key}")
     private String apiKey;
 
-    public ResponseEntity<String> getLodgings() {
+    public List<RvpApilodging> getLodgings() {
+        List<RvpApilodging> lodgings = null;
         String url = baseUrl + "/v1/account/lodgings";
         logger.debug("Lodgings URL : " + url);
         HttpHeaders headers = new HttpHeaders();
@@ -43,8 +48,12 @@ public class LodgingService {
         try {
             // Making the request using RestTemplate
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            lodgings = mapToLodging(response.getBody());
+            for (RvpApilodging lodging : lodgings) {
+                logger.debug("Recieved lodging :: " + lodging);
+            }
             logger.info("Successfully retrieved lodgings: {}", response);
-            return response;
+            return lodgings;
         } catch (Exception e) {
             logger.error("Error occurred while making API call", e);
             throw new RuntimeException("Failed to retrieve lodging details", e);
@@ -52,26 +61,25 @@ public class LodgingService {
     }
 
     public List<String> getLodgingIds() {
-        String jsonString = getLodgings().getBody();
+        List<RvpApilodging> lodgings = getLodgings();
         List<String> ids = new ArrayList<>();
-        JSONArray jsonArray = null;
-        try {
-            jsonArray = new JSONArray(jsonString);
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
+
+        for (RvpApilodging lodging : lodgings) {
+            ids.add(lodging.getId());
         }
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject jsonObject = null;
-            String id = null;
-            try {
-                jsonObject = jsonArray.getJSONObject(i);
-                id = jsonObject.getString("id");
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
-            ids.add(id);
-        }
+
         logger.info("Lodgings Ids : " + Arrays.toString(ids.toArray()));
         return ids;
+    }
+
+    public List<RvpApilodging> mapToLodging(String json) {
+        ObjectMapper mapper = new ObjectMapper();
+        List<RvpApilodging> lodgings = null;
+        try {
+            lodgings = mapper.readValue(json, new TypeReference<List<RvpApilodging>>() {});
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return lodgings;
     }
 }

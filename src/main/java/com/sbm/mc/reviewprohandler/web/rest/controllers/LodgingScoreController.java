@@ -17,7 +17,12 @@ public class LodgingScoreController {
     }
 
     @GetMapping("/lodgingScore")
-    public String getLodgingDetails(@RequestParam int pid, @RequestParam String fd, @RequestParam String td) {
-        return lodgingScoreService.getLodgingDetails(pid, fd, td);
+    public String getLodgingDetails(
+        @RequestParam String surveyId,
+        @RequestParam Long pid,
+        @RequestParam String fd,
+        @RequestParam String td
+    ) {
+        return lodgingScoreService.getLodgingScore(surveyId, pid, fd, td);
     }
 }

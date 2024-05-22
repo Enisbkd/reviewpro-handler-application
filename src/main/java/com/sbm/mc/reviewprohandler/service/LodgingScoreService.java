@@ -9,7 +9,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 public class LodgingScoreService {
@@ -28,27 +27,36 @@ public class LodgingScoreService {
         this.restTemplate = restTemplate;
     }
 
-    public String getLodgingDetails(int pid, String fd, String td) {
-        String url = UriComponentsBuilder.fromHttpUrl(baseUrl)
-            .pathSegment("reviewpro", "v1", "v1", "lodging", "source", "detail", "product")
-            .queryParam("pid", pid)
-            .queryParam("fd", fd)
-            .queryParam("td", td)
-            .toUriString();
+    public String getLodgingScore(String surveyId, Long pid, String fromDate, String toDate) {
+        String url = baseUrl + "/v1/surveys/" + surveyId + "/score/nps";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("accept", "application/json");
         headers.set("X-Api-Key", apiKey);
 
-        logger.info("Making request to URL: {}", url);
+        StringBuilder query = new StringBuilder();
+        query.append("?pid=").append(pid);
+        putIfNotNull(query, "fd", fromDate);
+        putIfNotNull(query, "td", toDate);
+
+        url += query.toString();
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
 
         try {
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), String.class);
-            logger.info("Response received: {}", response.getBody());
+            logger.info("Making request to URL: {}", url);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            logger.info("Received response: {}", response.getBody());
             return response.getBody();
         } catch (Exception e) {
-            logger.error("Error occurred while making API call", e);
-            throw new RuntimeException("Failed to retrieve lodging details", e);
+            logger.error("An unexpected error occurred", e);
+            throw e;
+        }
+    }
+
+    public void putIfNotNull(StringBuilder queryString, String key, String value) {
+        if (value != null) {
+            queryString.append("&").append(key).append("=").append(value);
         }
     }
 }

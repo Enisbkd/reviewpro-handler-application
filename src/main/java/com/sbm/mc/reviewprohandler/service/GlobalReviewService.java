@@ -1,5 +1,10 @@
 package com.sbm.mc.reviewprohandler.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sbm.mc.reviewprohandler.domain.RvpApiGlobalReview;
+import java.io.IOException;
+import java.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +14,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 public class GlobalReviewService {
@@ -27,36 +33,55 @@ public class GlobalReviewService {
         this.restTemplate = restTemplate;
     }
 
-    public String getGlobalReviewData(String surveyId, Long pid, String fromDate, String toDate) {
-        String url = baseUrl + "/v1/surveys/" + surveyId + "/score/nps";
+    public RvpApiGlobalReview getGlobalReview(int pid, String fd, String td) {
+        String url = UriComponentsBuilder.fromHttpUrl(baseUrl)
+            .pathSegment("v1", "lodging", "source", "detail", "product")
+            .queryParam("pid", pid)
+            .queryParam("fd", fd)
+            .queryParam("td", td)
+            .toUriString();
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("accept", "application/json");
         headers.set("X-Api-Key", apiKey);
 
-        StringBuilder query = new StringBuilder();
-        query.append("?pid=").append(pid);
-        putIfNotNull(query, "fd", fromDate);
-        putIfNotNull(query, "td", toDate);
-
-        url += query.toString();
-
-        HttpEntity<String> entity = new HttpEntity<>(headers);
+        logger.info("Making request to URL: {}", url);
 
         try {
-            logger.info("Making request to URL: {}", url);
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-            logger.info("Received response: {}", response.getBody());
-            return response.getBody();
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), String.class);
+            logger.info("Response received: {}", response.getBody());
+            return mapToGlobalReviews(response.getBody(), fd, td);
         } catch (Exception e) {
-            logger.error("An unexpected error occurred", e);
-            throw e;
+            logger.error("Error occurred while making API call", e);
+            throw new RuntimeException("Failed to retrieve lodging details", e);
         }
     }
 
-    public void putIfNotNull(StringBuilder queryString, String key, String value) {
-        if (value != null) {
-            queryString.append("&").append(key).append("=").append(value);
+    public RvpApiGlobalReview mapToGlobalReviews(String json, String fd, String td) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        RvpApiGlobalReview rvpApiGlobalReview = new RvpApiGlobalReview();
+
+        try {
+            logger.info("Json ::: " + json);
+            JsonNode rootNode = objectMapper.readTree(json);
+            JsonNode productNode = rootNode.get("product");
+
+            int pid = productNode.get("pid").asInt();
+            double prevGri = productNode.get("prevGri").asDouble();
+            String distribution = objectMapper.writeValueAsString(productNode.get("distribution"));
+            double gri = productNode.get("gri").asDouble();
+
+            rvpApiGlobalReview.setFd(LocalDate.parse(fd));
+            rvpApiGlobalReview.setTd(LocalDate.parse(td));
+            rvpApiGlobalReview.setLodgingid(pid);
+            rvpApiGlobalReview.setGri(gri);
+            rvpApiGlobalReview.setPrevGri(prevGri);
+            rvpApiGlobalReview.setDistribution(distribution.toString());
+
+            System.out.println(rvpApiGlobalReview);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return rvpApiGlobalReview;
     }
 }
