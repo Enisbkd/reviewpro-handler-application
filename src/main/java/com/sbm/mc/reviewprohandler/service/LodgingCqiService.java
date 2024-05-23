@@ -47,7 +47,7 @@ public class LodgingCqiService {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
             if (response.getStatusCode() == HttpStatus.OK) {
                 logger.info("API call successful, status code: {}", response.getStatusCode());
-                return mapToLodgingCqi(response.getBody(), fd, td);
+                return mapToLodgingCqi(response.getBody(), pid, fd, td);
             } else {
                 logger.error("API call failed, status code: {}", response.getStatusCode());
                 throw new RuntimeException("Failed to fetch data from API");
@@ -58,7 +58,7 @@ public class LodgingCqiService {
         }
     }
 
-    public List<RvpApiLodgingCqi> mapToLodgingCqi(String json, String fd, String td) {
+    public List<RvpApiLodgingCqi> mapToLodgingCqi(String json, String pid, String fd, String td) {
         ObjectMapper mapper = new ObjectMapper();
         List<RvpApiLodgingCqi> lodgingsCqi = null;
         try {
@@ -67,6 +67,8 @@ public class LodgingCqiService {
             throw new RuntimeException(e);
         }
         for (RvpApiLodgingCqi rvpApiLodgingCqi : lodgingsCqi) {
+            Integer hashKey = (pid + fd + td).hashCode();
+            rvpApiLodgingCqi.setId(hashKey);
             rvpApiLodgingCqi.setFd(LocalDate.parse(fd));
             rvpApiLodgingCqi.setTd(LocalDate.parse(td));
         }

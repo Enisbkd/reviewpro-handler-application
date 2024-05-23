@@ -22,7 +22,7 @@ public class RvpApiLodgingScore implements Serializable {
     private Integer lodgingId;
 
     @Field("survey_id")
-    private Integer surveyId;
+    private String surveyId;
 
     @Field("nps")
     private Double nps;
@@ -71,16 +71,16 @@ public class RvpApiLodgingScore implements Serializable {
         this.lodgingId = lodgingId;
     }
 
-    public Integer getSurveyId() {
+    public String getSurveyId() {
         return this.surveyId;
     }
 
-    public RvpApiLodgingScore surveyId(Integer surveyId) {
+    public RvpApiLodgingScore surveyId(String surveyId) {
         this.setSurveyId(surveyId);
         return this;
     }
 
-    public void setSurveyId(Integer surveyId) {
+    public void setSurveyId(String surveyId) {
         this.surveyId = surveyId;
     }
 

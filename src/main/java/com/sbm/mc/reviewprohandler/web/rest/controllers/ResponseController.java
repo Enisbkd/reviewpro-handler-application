@@ -1,10 +1,10 @@
 package com.sbm.mc.reviewprohandler.web.rest.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.sbm.mc.reviewprohandler.domain.RvpApiResponse;
-import com.sbm.mc.reviewprohandler.service.LodgingScoreService;
-import com.sbm.mc.reviewprohandler.service.LodgingService;
-import com.sbm.mc.reviewprohandler.service.ResponseService;
-import com.sbm.mc.reviewprohandler.service.SurveyService;
+import com.sbm.mc.reviewprohandler.service.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -23,18 +23,19 @@ public class ResponseController {
     private final SurveyService surveyService;
     private final LodgingService lodgingService;
     private final ResponseService responseService;
-    private final LodgingScoreService lodgingScoreServiceA;
+    private final KafkaProducerService kafkaProducerService;
 
     public ResponseController(
         SurveyService surveyService,
         LodgingService lodgingService,
         ResponseService responseService1,
-        LodgingScoreService lodgingScoreServiceA
+        LodgingScoreService lodgingScoreServiceA,
+        KafkaProducerService kafkaProducerService
     ) {
         this.surveyService = surveyService;
         this.lodgingService = lodgingService;
         this.responseService = responseService1;
-        this.lodgingScoreServiceA = lodgingScoreServiceA;
+        this.kafkaProducerService = kafkaProducerService;
     }
 
     @GetMapping("/responses")
@@ -88,6 +89,16 @@ public class ResponseController {
         List<String> logingIds = lodgingService.getLodgingIds();
         for (String logingId : logingIds) {
             responses.addAll(getResponsesByPid(Integer.parseInt(logingId), fd, td, flagged, onlyPublished, dateField));
+        }
+
+        for (RvpApiResponse response : responses) {
+            ObjectWriter ow = new ObjectMapper().findAndRegisterModules().writer().withDefaultPrettyPrinter();
+            try {
+                String json = ow.writeValueAsString(response);
+                kafkaProducerService.sendToKafka(json, response.getSurveyId(), "data-reviewpro-responses");
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
         return responses;
     }

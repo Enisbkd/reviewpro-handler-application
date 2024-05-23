@@ -20,7 +20,7 @@ public class RvpApiLodgingCqi implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @JsonIgnore
+    @JsonProperty("tech_id")
     private Integer id;
 
     @Field("lodging_id")

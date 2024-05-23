@@ -1,6 +1,6 @@
 package com.sbm.mc.reviewprohandler.service.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.sbm.mc.reviewprohandler.service.KafkaProducerService;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -21,7 +21,7 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
     @Autowired(required = true)
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    public void sendToKafka(JsonNode jsonNode, String id, String topic) {
+    public void sendToKafka(String message, String id, String topic) {
         // Check connection status
         Map<MetricName, ? extends Metric> metrics = kafkaTemplate.metrics();
         if (metrics.isEmpty()) {
@@ -30,7 +30,7 @@ public class KafkaProducerServiceImpl implements KafkaProducerService {
             log.debug("Producer is connected to at least one broker.");
         }
 
-        CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, id, jsonNode.toString());
+        CompletableFuture<SendResult<String, String>> future = kafkaTemplate.send(topic, id, message);
 
         // Add callback for handling success and failure
         future.whenComplete((result, exception) -> {
