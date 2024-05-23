@@ -2,7 +2,6 @@ package com.sbm.mc.reviewprohandler.domain;
 
 import java.io.Serializable;
 import java.time.Instant;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -14,6 +13,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class RvpApiResponse implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
+    private int id;
 
     @Field("survey_id")
     private String surveyId;
@@ -32,6 +33,14 @@ public class RvpApiResponse implements Serializable {
 
     @Field("plantorevisit")
     private Boolean plantorevisit;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getSurveyId() {
         return this.surveyId;

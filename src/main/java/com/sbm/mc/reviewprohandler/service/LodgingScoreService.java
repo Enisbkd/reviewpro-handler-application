@@ -72,10 +72,9 @@ public class LodgingScoreService {
             lodgingScore.setTd(LocalDate.parse(toDate));
             lodgingScore.setSurveyId(surveyId);
 
-            String keyToHash = surveyId + pid + fromDate + toDate;
-            int keyhash = keyToHash.hashCode();
+            int idHash = hashLodgingScore(surveyId, pid, fromDate, toDate);
 
-            lodgingScore.setId(keyhash);
+            lodgingScore.setId(idHash);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -86,5 +85,9 @@ public class LodgingScoreService {
         if (value != null) {
             queryString.append("&").append(key).append("=").append(value);
         }
+    }
+
+    public int hashLodgingScore(String surveyId, int pid, String fromDate, String toDate) {
+        return (surveyId + pid + fromDate + toDate).hashCode();
     }
 }

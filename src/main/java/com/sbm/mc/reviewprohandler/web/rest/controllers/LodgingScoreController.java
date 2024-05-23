@@ -1,6 +1,10 @@
 package com.sbm.mc.reviewprohandler.web.rest.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.sbm.mc.reviewprohandler.domain.RvpApiLodgingScore;
+import com.sbm.mc.reviewprohandler.service.KafkaProducerService;
 import com.sbm.mc.reviewprohandler.service.LodgingScoreService;
 import com.sbm.mc.reviewprohandler.service.LodgingService;
 import com.sbm.mc.reviewprohandler.service.SurveyService;
@@ -18,11 +22,18 @@ public class LodgingScoreController {
     private final LodgingScoreService lodgingScoreService;
     private final SurveyService surveyService;
     private final LodgingService lodgingService;
+    private final KafkaProducerService kafkaProducerService;
 
-    public LodgingScoreController(LodgingScoreService lodgingScoreService, SurveyService surveyService, LodgingService lodgingService) {
+    public LodgingScoreController(
+        LodgingScoreService lodgingScoreService,
+        SurveyService surveyService,
+        LodgingService lodgingService,
+        KafkaProducerService kafkaProducerService
+    ) {
         this.lodgingScoreService = lodgingScoreService;
         this.surveyService = surveyService;
         this.lodgingService = lodgingService;
+        this.kafkaProducerService = kafkaProducerService;
     }
 
     @GetMapping("/lodgingScore")
@@ -42,7 +53,7 @@ public class LodgingScoreController {
         for (String surveyId : surveyIds) {
             rvpApiLodgingScoresbyPid.add(lodgingScoreService.getLodgingScore(surveyId, pid, fd, td));
             try {
-                Thread.sleep(500);
+                Thread.sleep(700);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -51,7 +62,7 @@ public class LodgingScoreController {
         return rvpApiLodgingScoresbyPid;
     }
 
-    @GetMapping("/AllLodgingScores")
+    @GetMapping("/getAllLodgingScores")
     public List<RvpApiLodgingScore> getAllLodgingScores(@RequestParam String fd, @RequestParam String td) {
         List<RvpApiLodgingScore> allLodgingScores = new ArrayList<>();
 
@@ -60,6 +71,20 @@ public class LodgingScoreController {
             allLodgingScores.addAll(getLodgingScoresByPid(Integer.valueOf(lodgingId), fd, td));
         }
 
+        sendToKafka(allLodgingScores);
+
         return allLodgingScores;
+    }
+
+    private void sendToKafka(List<RvpApiLodgingScore> allLodgingScores) {
+        for (RvpApiLodgingScore lodgingScore : allLodgingScores) {
+            ObjectWriter ow = new ObjectMapper().findAndRegisterModules().writer().withDefaultPrettyPrinter();
+            try {
+                String json = ow.writeValueAsString(lodgingScore);
+                kafkaProducerService.sendToKafka(json, lodgingScore.getId().toString(), "data-reviewpro-lodgingScores");
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

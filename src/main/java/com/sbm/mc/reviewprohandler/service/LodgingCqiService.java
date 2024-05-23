@@ -31,7 +31,7 @@ public class LodgingCqiService {
         this.restTemplate = restTemplate;
     }
 
-    public List<RvpApiLodgingCqi> getLodgingIndex(String pid, String fd, String td) {
+    public List<RvpApiLodgingCqi> getLodgingIndex(int pid, String fd, String td) {
         String urlTemplate = baseUrl + "/v1/lodging/index/cqi";
 
         String url = String.format("%s?pid=%s&fd=%s&td=%s", urlTemplate, pid, fd, td);
@@ -58,7 +58,7 @@ public class LodgingCqiService {
         }
     }
 
-    public List<RvpApiLodgingCqi> mapToLodgingCqi(String json, String pid, String fd, String td) {
+    public List<RvpApiLodgingCqi> mapToLodgingCqi(String json, int pid, String fd, String td) {
         ObjectMapper mapper = new ObjectMapper();
         List<RvpApiLodgingCqi> lodgingsCqi = null;
         try {
@@ -67,11 +67,15 @@ public class LodgingCqiService {
             throw new RuntimeException(e);
         }
         for (RvpApiLodgingCqi rvpApiLodgingCqi : lodgingsCqi) {
-            Integer hashKey = (pid + fd + td).hashCode();
-            rvpApiLodgingCqi.setId(hashKey);
+            Integer hashId = hashLodgingCqiId(pid, fd, td);
+            rvpApiLodgingCqi.setId(hashId);
             rvpApiLodgingCqi.setFd(LocalDate.parse(fd));
             rvpApiLodgingCqi.setTd(LocalDate.parse(td));
         }
         return lodgingsCqi;
+    }
+
+    public int hashLodgingCqiId(int productId, String fromDate, String toDate) {
+        return (productId + fromDate + toDate).hashCode();
     }
 }

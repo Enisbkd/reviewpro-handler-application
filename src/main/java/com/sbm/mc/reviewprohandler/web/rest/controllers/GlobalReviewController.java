@@ -1,10 +1,12 @@
 package com.sbm.mc.reviewprohandler.web.rest.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.sbm.mc.reviewprohandler.domain.RvpApiGlobalReview;
 import com.sbm.mc.reviewprohandler.service.GlobalReviewService;
-import com.sbm.mc.reviewprohandler.service.LodgingScoreService;
+import com.sbm.mc.reviewprohandler.service.KafkaProducerService;
 import com.sbm.mc.reviewprohandler.service.LodgingService;
-import com.sbm.mc.reviewprohandler.service.SurveyService;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -21,18 +23,17 @@ public class GlobalReviewController {
     private static final Logger logger = LoggerFactory.getLogger(GlobalReviewController.class);
 
     private final GlobalReviewService globalReviewService;
-    private final SurveyService surveyService;
     private final LodgingService lodgingService;
+    private final KafkaProducerService kafkaProducerService;
 
     public GlobalReviewController(
-        LodgingScoreService lodgingScoreService,
         GlobalReviewService globalReviewService,
-        SurveyService surveyService,
-        LodgingService lodgingService
+        LodgingService lodgingService,
+        KafkaProducerService kafkaProducerService
     ) {
         this.globalReviewService = globalReviewService;
-        this.surveyService = surveyService;
         this.lodgingService = lodgingService;
+        this.kafkaProducerService = kafkaProducerService;
     }
 
     @GetMapping("/globalReview")
@@ -40,32 +41,25 @@ public class GlobalReviewController {
         return globalReviewService.getGlobalReview(pid, fd, td);
     }
 
-    @GetMapping("/getAllGlobalReviewsByPid")
-    public List<RvpApiGlobalReview> getAllSurveysNpsByPid(@RequestParam int pid, @RequestParam String fd, @RequestParam String td) {
-        List<RvpApiGlobalReview> globalReviewsByPid = new ArrayList<>();
-        List<String> surveyIds = surveyService.extractSurveyIds();
-        RvpApiGlobalReview review = null;
-        for (String surveyId : surveyIds) {
-            logger.debug("**********************************************************************");
-            review = globalReviewService.getGlobalReview(pid, fd, td);
-            logger.debug("Review for pid : " + pid + " on survey: " + surveyId + " :: " + review);
-            globalReviewsByPid.add(review);
+    @GetMapping("/getAllGlobalReviews")
+    public List<RvpApiGlobalReview> getAllSurveysNps(@RequestParam String fd, @RequestParam String td) {
+        List<RvpApiGlobalReview> globalReviews = new ArrayList<>();
+        List<String> logingIds = lodgingService.getLodgingIds();
+        for (String logingId : logingIds) {
+            globalReviews.add(getNps(Integer.parseInt(logingId), fd, td));
+        }
+        return globalReviews;
+    }
+
+    private void sendToKafka(List<RvpApiGlobalReview> globalReviews) {
+        for (RvpApiGlobalReview globalReview : globalReviews) {
+            ObjectWriter ow = new ObjectMapper().findAndRegisterModules().writer().withDefaultPrettyPrinter();
             try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
+                String json = ow.writeValueAsString(globalReview);
+                kafkaProducerService.sendToKafka(json, globalReview.getId().toString(), "data-reviewpro-globalReviews");
+            } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
         }
-        return globalReviewsByPid;
-    }
-
-    @GetMapping("/getAllGlobalReviews")
-    public List<List<RvpApiGlobalReview>> getAllSurveysNps(@RequestParam String fd, @RequestParam String td) {
-        List<List<RvpApiGlobalReview>> globalReviews = new ArrayList<>();
-        List<String> logingIds = lodgingService.getLodgingIds();
-        for (String logingId : logingIds) {
-            globalReviews.add(getAllSurveysNpsByPid(Math.toIntExact(Long.valueOf(logingId)), fd, td));
-        }
-        return globalReviews;
     }
 }

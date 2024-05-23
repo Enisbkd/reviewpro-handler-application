@@ -70,7 +70,7 @@ public class ResponseService {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
             logger.info("Received response with status code: {}", response.getStatusCode());
             logger.info(response.getBody());
-            return buildResponseObjects(response.getBody());
+            return buildResponseObjects(response.getBody(), surveyId, fromDate, toDate);
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             logger.error("HTTP error occurred: {}", e.getStatusCode());
             logger.error("Error response body: {}", e.getResponseBodyAsString());
@@ -81,7 +81,7 @@ public class ResponseService {
         }
     }
 
-    public List<RvpApiResponse> buildResponseObjects(String jsonString) {
+    public List<RvpApiResponse> buildResponseObjects(String jsonString, String surveyId, String fromDate, String toDate) {
         ObjectMapper objectMapper = new ObjectMapper();
         List<RvpApiResponse> responsesObjects = new ArrayList<>();
 
@@ -99,6 +99,8 @@ public class ResponseService {
 
                 for (JsonNode answerNode : answersNode) {
                     RvpApiResponse response = new RvpApiResponse();
+                    int hashId = hashResponseId(productId, surveyId, fromDate, toDate);
+                    response.setId(hashId);
                     response.setDate(Instant.ofEpochMilli(date));
                     response.setLodgingId(productId);
                     response.setCustomScore(customScoreValue);
@@ -117,5 +119,9 @@ public class ResponseService {
         }
 
         return responsesObjects;
+    }
+
+    public int hashResponseId(int productId, String surveyId, String fromDate, String toDate) {
+        return (productId + surveyId + fromDate + toDate).hashCode();
     }
 }

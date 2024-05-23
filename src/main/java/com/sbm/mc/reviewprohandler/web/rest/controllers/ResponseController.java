@@ -90,7 +90,11 @@ public class ResponseController {
         for (String logingId : logingIds) {
             responses.addAll(getResponsesByPid(Integer.parseInt(logingId), fd, td, flagged, onlyPublished, dateField));
         }
+        sendToKafka(responses);
+        return responses;
+    }
 
+    private void sendToKafka(List<RvpApiResponse> responses) {
         for (RvpApiResponse response : responses) {
             ObjectWriter ow = new ObjectMapper().findAndRegisterModules().writer().withDefaultPrettyPrinter();
             try {
@@ -100,6 +104,5 @@ public class ResponseController {
                 throw new RuntimeException(e);
             }
         }
-        return responses;
     }
 }

@@ -71,6 +71,8 @@ public class GlobalReviewService {
             String distribution = objectMapper.writeValueAsString(productNode.get("distribution"));
             double gri = productNode.get("gri").asDouble();
 
+            int hashId = hashGlobalReviewId(pid, fd, td);
+            rvpApiGlobalReview.setId(hashId);
             rvpApiGlobalReview.setFd(LocalDate.parse(fd));
             rvpApiGlobalReview.setTd(LocalDate.parse(td));
             rvpApiGlobalReview.setLodgingid(pid);
@@ -83,5 +85,9 @@ public class GlobalReviewService {
             e.printStackTrace();
         }
         return rvpApiGlobalReview;
+    }
+
+    public int hashGlobalReviewId(int productId, String fromDate, String toDate) {
+        return (productId + fromDate + toDate).hashCode();
     }
 }
