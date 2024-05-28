@@ -34,6 +34,16 @@ public class RvpApiResponse implements Serializable {
     @Field("plantorevisit")
     private Boolean plantorevisit;
 
+    private String label;
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
     public int getId() {
         return id;
     }
@@ -128,16 +138,29 @@ public class RvpApiResponse implements Serializable {
         return getClass().hashCode();
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "RvpApiResponse{" +
-            ", surveyId=" + getSurveyId() +
-            ", lodgingId=" + getLodgingId() +
-            ", date='" + getDate() + "'" +
-            ", overallsatsifaction=" + getOverallsatsifaction() +
-            ", customScore=" + getCustomScore() +
-            ", plantorevisit='" + getPlantorevisit() + "'" +
-            "}";
+        return (
+            "RvpApiResponse{" +
+            "id=" +
+            id +
+            ", surveyId='" +
+            surveyId +
+            '\'' +
+            ", lodgingId=" +
+            lodgingId +
+            ", date=" +
+            date +
+            ", overallsatsifaction=" +
+            overallsatsifaction +
+            ", customScore=" +
+            customScore +
+            ", plantorevisit=" +
+            plantorevisit +
+            ", label='" +
+            label +
+            '\'' +
+            '}'
+        );
     }
 }

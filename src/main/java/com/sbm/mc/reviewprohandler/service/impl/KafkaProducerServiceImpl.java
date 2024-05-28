@@ -1,6 +1,5 @@
 package com.sbm.mc.reviewprohandler.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.sbm.mc.reviewprohandler.service.KafkaProducerService;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;

@@ -48,6 +48,7 @@ public class GlobalReviewController {
         for (String logingId : logingIds) {
             globalReviews.add(getNps(Integer.parseInt(logingId), fd, td));
         }
+        sendToKafka(globalReviews);
         return globalReviews;
     }
 
@@ -56,7 +57,7 @@ public class GlobalReviewController {
             ObjectWriter ow = new ObjectMapper().findAndRegisterModules().writer().withDefaultPrettyPrinter();
             try {
                 String json = ow.writeValueAsString(globalReview);
-                kafkaProducerService.sendToKafka(json, globalReview.getId().toString(), "data-reviewpro-globalReviews");
+                kafkaProducerService.sendToKafka(json, globalReview.getId().toString(), "data-reviewpro-global-review");
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

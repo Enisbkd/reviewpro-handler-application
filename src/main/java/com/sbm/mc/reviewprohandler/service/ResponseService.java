@@ -39,7 +39,7 @@ public class ResponseService {
     @Value("${reviewpro.api.key}")
     private String apiKey;
 
-    public List<RvpApiResponse> getSurveyResponses(
+    public List<RvpApiResponse> getSurveyResponsesWithPagination(
         String surveyId,
         int pid,
         String fromDate,
@@ -47,6 +47,35 @@ public class ResponseService {
         String flagged,
         boolean onlyPublished,
         String dateField
+    ) {
+        List<RvpApiResponse> allResponses = new ArrayList<>();
+        String firstResponse = getSurveyResponses(surveyId, pid, fromDate, toDate, flagged, onlyPublished, dateField, 0);
+        allResponses.addAll(buildResponseObjects(null, surveyId, pid, fromDate, toDate, flagged, onlyPublished, dateField, 0));
+        int totalResponses = getTotalResponses(firstResponse);
+        logger.debug("Total responses : " + totalResponses);
+        int callLimit = 100;
+        if (totalResponses > callLimit) {
+            int loopLimit = totalResponses / callLimit;
+            for (int i = 1; i <= loopLimit; i++) {
+                logger.debug("Paginating over responses: loop number : " + i);
+                allResponses.addAll(
+                    buildResponseObjects(null, surveyId, pid, fromDate, toDate, flagged, onlyPublished, dateField, i * callLimit)
+                );
+            }
+            logger.debug("Responses parsed : " + allResponses.size());
+        }
+        return allResponses;
+    }
+
+    public String getSurveyResponses(
+        String surveyId,
+        int pid,
+        String fromDate,
+        String toDate,
+        String flagged,
+        boolean onlyPublished,
+        String dateField,
+        int offset
     ) {
         String urlTemplate = baseUrl + "/v3/surveys/{surveyId}/responses";
 
@@ -56,7 +85,8 @@ public class ResponseService {
             .queryParam("td", toDate)
             .queryParam("flagged", flagged)
             .queryParam("onlyPublished", onlyPublished ? 1 : 0)
-            .queryParam("dateField", dateField);
+            .queryParam("dateField", dateField)
+            .queryParam("offset", offset);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("accept", "application/json");
@@ -70,7 +100,7 @@ public class ResponseService {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
             logger.info("Received response with status code: {}", response.getStatusCode());
             logger.info(response.getBody());
-            return buildResponseObjects(response.getBody(), surveyId, fromDate, toDate);
+            return response.getBody();
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             logger.error("HTTP error occurred: {}", e.getStatusCode());
             logger.error("Error response body: {}", e.getResponseBodyAsString());
@@ -81,7 +111,20 @@ public class ResponseService {
         }
     }
 
-    public List<RvpApiResponse> buildResponseObjects(String jsonString, String surveyId, String fromDate, String toDate) {
+    public List<RvpApiResponse> buildResponseObjects(
+        String jsonString,
+        String surveyId,
+        int pid,
+        String fromDate,
+        String toDate,
+        String flagged,
+        boolean onlyPublished,
+        String dateField,
+        int offset
+    ) {
+        if (jsonString == null) {
+            jsonString = getSurveyResponses(surveyId, pid, fromDate, toDate, flagged, onlyPublished, dateField, offset);
+        }
         ObjectMapper objectMapper = new ObjectMapper();
         List<RvpApiResponse> responsesObjects = new ArrayList<>();
 
@@ -98,18 +141,21 @@ public class ResponseService {
                 List<String> labels = Arrays.asList("Revisite Bay", "Revisite HH", "Revisite BH", "Revisite HP");
 
                 for (JsonNode answerNode : answersNode) {
+                    String label = answerNode.get("label") == null ? "" : answerNode.get("label").asText();
+                    int hashId = hashResponseId(productId, surveyId, fromDate, toDate, label);
                     RvpApiResponse response = new RvpApiResponse();
-                    int hashId = hashResponseId(productId, surveyId, fromDate, toDate);
+
                     response.setId(hashId);
                     response.setDate(Instant.ofEpochMilli(date));
                     response.setLodgingId(productId);
                     response.setCustomScore(customScoreValue);
                     response.setSurveyId(answerNode.get("id").asText());
+                    response.setLabel(label);
                     if (answerNode.get("label").asText().equalsIgnoreCase("Satisfaction globale")) {
                         response.setOverallsatsifaction(answerNode.get("answer").asDouble());
                     }
                     if (labels.contains(answerNode.get("label").asText())) {
-                        response.setPlantorevisit(answerNode.get("answer").asText().equalsIgnoreCase("yes") ? true : false);
+                        response.setPlantorevisit(answerNode.get("answer").asText().equalsIgnoreCase("yes"));
                     }
                     responsesObjects.add(response);
                 }
@@ -121,7 +167,17 @@ public class ResponseService {
         return responsesObjects;
     }
 
-    public int hashResponseId(int productId, String surveyId, String fromDate, String toDate) {
-        return (productId + surveyId + fromDate + toDate).hashCode();
+    public int getTotalResponses(String jsonString) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            JsonNode rootNode = objectMapper.readTree(jsonString);
+            return rootNode.get("total").asInt();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int hashResponseId(int productId, String surveyId, String fromDate, String toDate, String label) {
+        return (productId + surveyId + fromDate + toDate + label).hashCode();
     }
 }

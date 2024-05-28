@@ -48,7 +48,7 @@ public class ResponseController {
         @RequestParam boolean onlyPublished,
         @RequestParam String dateField
     ) {
-        return responseService.getSurveyResponses(surveyId, pid, fd, td, flagged, onlyPublished, dateField);
+        return responseService.getSurveyResponsesWithPagination(surveyId, pid, fd, td, flagged, onlyPublished, dateField);
     }
 
     @GetMapping("/getResponsesByPid")
