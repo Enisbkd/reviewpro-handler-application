@@ -3,6 +3,8 @@ package com.sbm.mc.reviewprohandler.web.rest.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sbm.mc.reviewprohandler.domain.RvpApiGlobalReview;
 import com.sbm.mc.reviewprohandler.service.GlobalReviewService;
 import com.sbm.mc.reviewprohandler.service.KafkaProducerService;
@@ -36,12 +38,12 @@ public class GlobalReviewController {
         this.kafkaProducerService = kafkaProducerService;
     }
 
-    @GetMapping("/globalReview")
+    @GetMapping("/global-review-by-pid")
     public RvpApiGlobalReview getNps(@RequestParam int pid, @RequestParam String fd, @RequestParam String td) {
         return globalReviewService.getGlobalReview(pid, fd, td);
     }
 
-    @GetMapping("/getAllGlobalReviews")
+    @GetMapping("/global-reviews")
     public List<RvpApiGlobalReview> getAllSurveysNps(@RequestParam String fd, @RequestParam String td) {
         List<RvpApiGlobalReview> globalReviews = new ArrayList<>();
         List<String> logingIds = lodgingService.getLodgingIds();
@@ -54,10 +56,14 @@ public class GlobalReviewController {
 
     private void sendToKafka(List<RvpApiGlobalReview> globalReviews) {
         for (RvpApiGlobalReview globalReview : globalReviews) {
-            ObjectWriter ow = new ObjectMapper().findAndRegisterModules().writer().withDefaultPrettyPrinter();
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            ObjectWriter ow = objectMapper.findAndRegisterModules().writer().withDefaultPrettyPrinter();
+
             try {
-                String json = ow.writeValueAsString(globalReview);
-                kafkaProducerService.sendToKafka(json, globalReview.getId().toString(), "data-reviewpro-global-review");
+                String bytes = ow.writeValueAsString(globalReview);
+                kafkaProducerService.sendToKafka(bytes, globalReview.getId().toString(), "data-reviewpro-global-review");
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

@@ -29,7 +29,7 @@ public class LodgingController {
 
     @GetMapping("/lodgings")
     public List<RvpApilodging> getLodgings() {
-        List<RvpApilodging> rvpApilodgings = lodgingService.getLodgings();
+        List<RvpApilodging> rvpApilodgings = lodgingService.getAllLodgings();
         sendToKafka(rvpApilodgings);
         return rvpApilodgings;
     }

@@ -36,7 +36,7 @@ public class LodgingScoreController {
         this.kafkaProducerService = kafkaProducerService;
     }
 
-    @GetMapping("/lodgingScore")
+    @GetMapping("/lodging-score")
     public RvpApiLodgingScore getLodgingDetails(
         @RequestParam String surveyId,
         @RequestParam Integer pid,
@@ -46,7 +46,7 @@ public class LodgingScoreController {
         return lodgingScoreService.getLodgingScore(surveyId, pid, fd, td);
     }
 
-    @GetMapping("/lodgingScoresbyPid")
+    @GetMapping("/lodging-scores-by-pid")
     public List<RvpApiLodgingScore> getLodgingScoresByPid(@RequestParam Integer pid, @RequestParam String fd, @RequestParam String td) {
         List<RvpApiLodgingScore> rvpApiLodgingScoresbyPid = new ArrayList<>();
         List<String> surveyIds = surveyService.extractSurveyIds();
@@ -62,7 +62,7 @@ public class LodgingScoreController {
         return rvpApiLodgingScoresbyPid;
     }
 
-    @GetMapping("/getAllLodgingScores")
+    @GetMapping("/lodging-scores")
     public List<RvpApiLodgingScore> getAllLodgingScores(@RequestParam String fd, @RequestParam String td) {
         List<RvpApiLodgingScore> allLodgingScores = new ArrayList<>();
 

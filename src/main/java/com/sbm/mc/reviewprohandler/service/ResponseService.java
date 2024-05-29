@@ -131,34 +131,33 @@ public class ResponseService {
         try {
             JsonNode rootNode = objectMapper.readTree(jsonString);
             ArrayNode responsesNode = (ArrayNode) rootNode.get("responses");
-
             for (JsonNode responseNode : responsesNode) {
                 Long date = responseNode.get("date").asLong();
                 int productId = responseNode.get("productId").asInt();
                 double customScoreValue = responseNode.get("customScore").get("value").asDouble();
 
                 ArrayNode answersNode = (ArrayNode) responseNode.get("answers");
-                List<String> labels = Arrays.asList("Revisite Bay", "Revisite HH", "Revisite BH", "Revisite HP");
+                List<String> revisitLabels = Arrays.asList("Revisite Bay", "Revisite HH", "Revisite BH", "Revisite HP");
+                RvpApiResponse response = new RvpApiResponse();
+
+                int hashId = hashResponseId(productId, surveyId, date);
+                response.setSurveyId(responseNode.get("id").asText());
+                response.setId(hashId);
+                response.setDate(Instant.ofEpochMilli(date));
+                response.setLodgingId(productId);
+                response.setCustomScore(customScoreValue);
 
                 for (JsonNode answerNode : answersNode) {
                     String label = answerNode.get("label") == null ? "" : answerNode.get("label").asText();
-                    int hashId = hashResponseId(productId, surveyId, fromDate, toDate, label);
-                    RvpApiResponse response = new RvpApiResponse();
 
-                    response.setId(hashId);
-                    response.setDate(Instant.ofEpochMilli(date));
-                    response.setLodgingId(productId);
-                    response.setCustomScore(customScoreValue);
-                    response.setSurveyId(answerNode.get("id").asText());
-                    response.setLabel(label);
-                    if (answerNode.get("label").asText().equalsIgnoreCase("Satisfaction globale")) {
+                    if (label.equalsIgnoreCase("Satisfaction globale")) {
                         response.setOverallsatsifaction(answerNode.get("answer").asDouble());
                     }
-                    if (labels.contains(answerNode.get("label").asText())) {
+                    if (revisitLabels.contains(label)) {
                         response.setPlantorevisit(answerNode.get("answer").asText().equalsIgnoreCase("yes"));
                     }
-                    responsesObjects.add(response);
                 }
+                responsesObjects.add(response);
             }
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -177,7 +176,7 @@ public class ResponseService {
         }
     }
 
-    public int hashResponseId(int productId, String surveyId, String fromDate, String toDate, String label) {
-        return (productId + surveyId + fromDate + toDate + label).hashCode();
+    public int hashResponseId(int productId, String surveyId, Long date) {
+        return (productId + surveyId + date).hashCode();
     }
 }

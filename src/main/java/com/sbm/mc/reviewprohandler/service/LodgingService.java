@@ -11,9 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -35,13 +32,18 @@ public class LodgingService {
     @Value("${reviewpro.api.key}")
     private String apiKey;
 
-    public List<RvpApilodging> getLodgings() {
+    public List<RvpApilodging> getLodgings(String productType) {
         List<RvpApilodging> lodgings = null;
         String url = baseUrl + "/v1/account/lodgings";
         logger.debug("Lodgings URL : " + url);
         HttpHeaders headers = new HttpHeaders();
         headers.set("accept", "application/json");
         headers.set("X-Api-Key", apiKey);
+
+        StringBuilder query = new StringBuilder();
+        query.append("?productType=").append(productType);
+
+        url += query.toString();
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
@@ -60,8 +62,15 @@ public class LodgingService {
         }
     }
 
+    public List<RvpApilodging> getAllLodgings() {
+        List<RvpApilodging> hotelsAndRestaurants = new ArrayList<>();
+        hotelsAndRestaurants.addAll(getLodgings("RESTAURANT"));
+        hotelsAndRestaurants.addAll(getLodgings("HOTEL"));
+        return hotelsAndRestaurants;
+    }
+
     public List<String> getLodgingIds() {
-        List<RvpApilodging> lodgings = getLodgings();
+        List<RvpApilodging> lodgings = getAllLodgings();
         List<String> ids = new ArrayList<>();
 
         for (RvpApilodging lodging : lodgings) {

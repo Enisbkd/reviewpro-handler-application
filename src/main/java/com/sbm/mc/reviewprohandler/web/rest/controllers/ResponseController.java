@@ -38,7 +38,7 @@ public class ResponseController {
         this.kafkaProducerService = kafkaProducerService;
     }
 
-    @GetMapping("/responses")
+    @GetMapping("/responses-by-pid-and-surveyid")
     public List<RvpApiResponse> getSurveyResponses(
         @RequestParam String surveyId,
         @RequestParam int pid,
@@ -48,10 +48,20 @@ public class ResponseController {
         @RequestParam boolean onlyPublished,
         @RequestParam String dateField
     ) {
-        return responseService.getSurveyResponsesWithPagination(surveyId, pid, fd, td, flagged, onlyPublished, dateField);
+        List<RvpApiResponse> responses = responseService.getSurveyResponsesWithPagination(
+            surveyId,
+            pid,
+            fd,
+            td,
+            flagged,
+            onlyPublished,
+            dateField
+        );
+        sendToKafka(responses);
+        return responses;
     }
 
-    @GetMapping("/getResponsesByPid")
+    @GetMapping("/responses-by-pid")
     public List<RvpApiResponse> getResponsesByPid(
         @RequestParam int pid,
         @RequestParam String fd,
@@ -64,12 +74,11 @@ public class ResponseController {
         List<RvpApiResponse> allPidResponses = new ArrayList<>();
         String response = null;
         for (String surveyId : surveyIds) {
-            logger.info("**********************************************************************");
             List<RvpApiResponse> responses = getSurveyResponses(surveyId, pid, fd, td, flagged, onlyPublished, dateField);
             logger.info("Response for pid : " + pid + " on survey: " + surveyId + " :: " + response);
             allPidResponses.addAll(responses);
             try {
-                Thread.sleep(500);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -77,7 +86,7 @@ public class ResponseController {
         return allPidResponses;
     }
 
-    @GetMapping("/getAllResponses")
+    @GetMapping("/responses")
     public List<RvpApiResponse> getAllResponses(
         @RequestParam String fd,
         @RequestParam String td,
@@ -90,7 +99,6 @@ public class ResponseController {
         for (String logingId : logingIds) {
             responses.addAll(getResponsesByPid(Integer.parseInt(logingId), fd, td, flagged, onlyPublished, dateField));
         }
-        sendToKafka(responses);
         return responses;
     }
 

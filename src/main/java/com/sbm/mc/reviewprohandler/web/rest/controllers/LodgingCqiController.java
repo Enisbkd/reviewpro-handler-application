@@ -32,19 +32,19 @@ public class LodgingCqiController {
         this.kafkaProducerService = kafkaProducerService;
     }
 
-    @GetMapping("/lodgingCqi")
-    public List<RvpApiLodgingCqi> getLodgingIndex(@RequestParam int pid, @RequestParam String fd, @RequestParam String td) {
+    @GetMapping("/lodging-cqi-by-pid")
+    public List<RvpApiLodgingCqi> getLodgingCqis(@RequestParam int pid, @RequestParam String fd, @RequestParam String td) {
         return lodgingCqiService.getLodgingIndex(pid, fd, td);
     }
 
-    @GetMapping("/getAllLodgingCqis")
+    @GetMapping("/lodging-cqis")
     public List<RvpApiLodgingCqi> getAllLodgingCqis(@RequestParam String fd, @RequestParam String td) {
         List<RvpApiLodgingCqi> allLodgingCqis = new ArrayList<>();
         List<String> lodgingIds = lodgingService.getLodgingIds();
         for (String lodgingId : lodgingIds) {
             allLodgingCqis.addAll(lodgingCqiService.getLodgingIndex(Integer.valueOf(lodgingId), fd, td));
             try {
-                Thread.sleep(500);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

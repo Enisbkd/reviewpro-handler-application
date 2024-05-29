@@ -34,16 +34,6 @@ public class RvpApiResponse implements Serializable {
     @Field("plantorevisit")
     private Boolean plantorevisit;
 
-    private String label;
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
     public int getId() {
         return id;
     }
@@ -134,7 +124,6 @@ public class RvpApiResponse implements Serializable {
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 
@@ -157,8 +146,6 @@ public class RvpApiResponse implements Serializable {
             customScore +
             ", plantorevisit=" +
             plantorevisit +
-            ", label='" +
-            label +
             '\'' +
             '}'
         );

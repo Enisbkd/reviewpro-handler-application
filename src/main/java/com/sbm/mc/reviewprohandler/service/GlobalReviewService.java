@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sbm.mc.reviewprohandler.domain.RvpApiGlobalReview;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,7 +63,7 @@ public class GlobalReviewService {
         RvpApiGlobalReview rvpApiGlobalReview = new RvpApiGlobalReview();
 
         try {
-            logger.info("Json ::: " + json);
+            logger.info("Recieved Json ::: " + json);
             JsonNode rootNode = objectMapper.readTree(json);
             JsonNode productNode = rootNode.get("product");
 
