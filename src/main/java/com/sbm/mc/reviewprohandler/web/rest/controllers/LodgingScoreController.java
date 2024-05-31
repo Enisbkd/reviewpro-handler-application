@@ -36,7 +36,7 @@ public class LodgingScoreController {
         this.kafkaProducerService = kafkaProducerService;
     }
 
-    @GetMapping("/lodging-score")
+    @GetMapping("/lodging-score-by-pid-and-surveyid")
     public RvpApiLodgingScore getLodgingDetails(
         @RequestParam String surveyId,
         @RequestParam Integer pid,
@@ -47,9 +47,17 @@ public class LodgingScoreController {
     }
 
     @GetMapping("/lodging-scores-by-pid")
-    public List<RvpApiLodgingScore> getLodgingScoresByPid(@RequestParam Integer pid, @RequestParam String fd, @RequestParam String td) {
+    public List<RvpApiLodgingScore> getLodgingScoresByPid(
+        @RequestParam Integer pid,
+        @RequestParam String fd,
+        @RequestParam String td,
+        @RequestParam(required = false) List<String> surveyIds
+    ) {
         List<RvpApiLodgingScore> rvpApiLodgingScoresbyPid = new ArrayList<>();
-        List<String> surveyIds = surveyService.extractSurveyIds();
+        if (surveyIds == null) {
+            surveyIds = surveyService.extractSurveyIds();
+        }
+
         for (String surveyId : surveyIds) {
             rvpApiLodgingScoresbyPid.add(lodgingScoreService.getLodgingScore(surveyId, pid, fd, td));
             try {
@@ -65,10 +73,15 @@ public class LodgingScoreController {
     @GetMapping("/lodging-scores")
     public List<RvpApiLodgingScore> getAllLodgingScores(@RequestParam String fd, @RequestParam String td) {
         List<RvpApiLodgingScore> allLodgingScores = new ArrayList<>();
-
+        List<String> surveyIds = surveyService.extractSurveyIds();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         List<String> lodgingIds = lodgingService.getLodgingIds();
         for (String lodgingId : lodgingIds) {
-            allLodgingScores.addAll(getLodgingScoresByPid(Integer.valueOf(lodgingId), fd, td));
+            allLodgingScores.addAll(getLodgingScoresByPid(Integer.valueOf(lodgingId), fd, td, surveyIds));
         }
 
         sendToKafka(allLodgingScores);

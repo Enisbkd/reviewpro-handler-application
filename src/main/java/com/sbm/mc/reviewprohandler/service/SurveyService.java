@@ -6,12 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sbm.mc.reviewprohandler.domain.RvpApiSurvey;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -89,5 +88,18 @@ public class SurveyService {
             throw new RuntimeException(e);
         }
         return surveys;
+    }
+
+    public boolean pidAndSurveyMap(String pid, String surveyId, List<RvpApiSurvey> surveys) {
+        HashMap<String, String> surveyAndPids = new HashMap<>();
+        for (RvpApiSurvey survey : surveys) {
+            surveyAndPids.put(survey.getId(), survey.getPids());
+        }
+        if (surveyAndPids.get(surveyId).contains(pid)) {
+            logger.debug("SurveyId " + surveyId + " is used for pid : " + pid);
+            return true;
+        }
+        logger.debug("SurveyId " + surveyId + " is not used for pid : " + pid);
+        return false;
     }
 }

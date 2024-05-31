@@ -4,7 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.sbm.mc.reviewprohandler.domain.RvpApiResponse;
-import com.sbm.mc.reviewprohandler.service.*;
+import com.sbm.mc.reviewprohandler.domain.RvpApiSurvey;
+import com.sbm.mc.reviewprohandler.service.KafkaProducerService;
+import com.sbm.mc.reviewprohandler.service.LodgingService;
+import com.sbm.mc.reviewprohandler.service.ResponseService;
+import com.sbm.mc.reviewprohandler.service.SurveyService;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -24,18 +28,19 @@ public class ResponseController {
     private final LodgingService lodgingService;
     private final ResponseService responseService;
     private final KafkaProducerService kafkaProducerService;
+    private final List<RvpApiSurvey> surveys;
 
     public ResponseController(
         SurveyService surveyService,
         LodgingService lodgingService,
-        ResponseService responseService1,
-        LodgingScoreService lodgingScoreServiceA,
+        ResponseService responseService,
         KafkaProducerService kafkaProducerService
     ) {
         this.surveyService = surveyService;
         this.lodgingService = lodgingService;
-        this.responseService = responseService1;
+        this.responseService = responseService;
         this.kafkaProducerService = kafkaProducerService;
+        this.surveys = surveyService.getSurveys();
     }
 
     @GetMapping("/responses-by-pid-and-surveyid")
@@ -48,16 +53,12 @@ public class ResponseController {
         @RequestParam boolean onlyPublished,
         @RequestParam String dateField
     ) {
-        List<RvpApiResponse> responses = responseService.getSurveyResponsesWithPagination(
-            surveyId,
-            pid,
-            fd,
-            td,
-            flagged,
-            onlyPublished,
-            dateField
-        );
-        sendToKafka(responses);
+        List<RvpApiResponse> responses = new ArrayList<>();
+        if (surveyService.pidAndSurveyMap(String.valueOf(pid), surveyId, surveys)) {
+            logger.debug("Getting Responses with match : ");
+            responses = responseService.getSurveyResponsesWithPagination(surveyId, pid, fd, td, flagged, onlyPublished, dateField);
+            sendToKafka(responses);
+        }
         return responses;
     }
 
@@ -68,9 +69,12 @@ public class ResponseController {
         @RequestParam String td,
         @RequestParam String flagged,
         @RequestParam boolean onlyPublished,
-        @RequestParam String dateField
+        @RequestParam String dateField,
+        @RequestParam(required = false) List<String> surveyIds
     ) {
-        List<String> surveyIds = surveyService.extractSurveyIds();
+        if (surveyIds == null) {
+            surveyIds = surveyService.extractSurveyIds();
+        }
         List<RvpApiResponse> allPidResponses = new ArrayList<>();
         String response = null;
         for (String surveyId : surveyIds) {
@@ -94,10 +98,16 @@ public class ResponseController {
         @RequestParam boolean onlyPublished,
         @RequestParam String dateField
     ) {
+        List<String> surveyIds = surveyService.extractSurveyIds();
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         List<RvpApiResponse> responses = new ArrayList<>();
         List<String> logingIds = lodgingService.getLodgingIds();
         for (String logingId : logingIds) {
-            responses.addAll(getResponsesByPid(Integer.parseInt(logingId), fd, td, flagged, onlyPublished, dateField));
+            responses.addAll(getResponsesByPid(Integer.parseInt(logingId), fd, td, flagged, onlyPublished, dateField, surveyIds));
         }
         return responses;
     }

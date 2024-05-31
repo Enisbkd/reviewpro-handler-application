@@ -2,6 +2,7 @@ package com.sbm.mc.reviewprohandler.domain;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.UUID;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;

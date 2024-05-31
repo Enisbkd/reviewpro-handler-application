@@ -98,7 +98,7 @@ public class ResponseService {
             String url = uriBuilder.buildAndExpand(surveyId).toUriString();
             logger.info("Sending request to URL: {}", url);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-            logger.info("Received response with status code: {}", response.getStatusCode());
+            logger.info("Response Service - Received response with status code: {}", response.getStatusCode());
             logger.info(response.getBody());
             return response.getBody();
         } catch (HttpClientErrorException | HttpServerErrorException e) {
