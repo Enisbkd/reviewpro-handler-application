@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 public class GlobalReviewController {
+
+    @Value("${spring.kafka.topics.global-reviews-topic}")
+    private String grTopic;
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalReviewController.class);
 
@@ -44,14 +50,15 @@ public class GlobalReviewController {
     }
 
     @GetMapping("/global-reviews")
-    public List<RvpApiGlobalReview> getAllSurveysNps(@RequestParam String fd, @RequestParam String td) {
+    public ResponseEntity<String> getAllSurveysNps(@RequestParam String fd, @RequestParam String td) {
         List<RvpApiGlobalReview> globalReviews = new ArrayList<>();
         List<String> logingIds = lodgingService.getLodgingIds();
         for (String logingId : logingIds) {
             globalReviews.add(getNps(Integer.parseInt(logingId), fd, td));
         }
+        logger.info("Sending " + globalReviews.size() + " to topic " + "");
         sendToKafka(globalReviews);
-        return globalReviews;
+        return new ResponseEntity<>("Returned " + globalReviews.size() + " Reviewpro global reviews.", HttpStatus.OK);
     }
 
     private void sendToKafka(List<RvpApiGlobalReview> globalReviews) {
@@ -63,7 +70,7 @@ public class GlobalReviewController {
 
             try {
                 String bytes = ow.writeValueAsString(globalReview);
-                kafkaProducerService.sendToKafka(bytes, globalReview.getId().toString(), "data-reviewpro-global-review");
+                kafkaProducerService.sendToKafka(bytes, globalReview.getId().toString(), grTopic);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

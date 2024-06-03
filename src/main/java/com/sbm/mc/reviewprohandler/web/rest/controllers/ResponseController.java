@@ -3,6 +3,8 @@ package com.sbm.mc.reviewprohandler.web.rest.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.sbm.mc.reviewprohandler.domain.RvpApiResponse;
 import com.sbm.mc.reviewprohandler.domain.RvpApiSurvey;
 import com.sbm.mc.reviewprohandler.service.KafkaProducerService;
@@ -13,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,6 +26,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 public class ResponseController {
+
+    @Value("${spring.kafka.topics.responses-topic}")
+    private String responsesTopic;
 
     private static final Logger logger = LoggerFactory.getLogger(ResponseController.class);
 
@@ -91,7 +99,7 @@ public class ResponseController {
     }
 
     @GetMapping("/responses")
-    public List<RvpApiResponse> getAllResponses(
+    public ResponseEntity<String> getAllResponses(
         @RequestParam String fd,
         @RequestParam String td,
         @RequestParam String flagged,
@@ -109,15 +117,18 @@ public class ResponseController {
         for (String logingId : logingIds) {
             responses.addAll(getResponsesByPid(Integer.parseInt(logingId), fd, td, flagged, onlyPublished, dateField, surveyIds));
         }
-        return responses;
+        return new ResponseEntity<>("Returned " + responses.size() + " Reviewpro responses.", HttpStatus.OK);
     }
 
     private void sendToKafka(List<RvpApiResponse> responses) {
         for (RvpApiResponse response : responses) {
-            ObjectWriter ow = new ObjectMapper().findAndRegisterModules().writer().withDefaultPrettyPrinter();
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            ObjectWriter ow = objectMapper.findAndRegisterModules().writer().withDefaultPrettyPrinter();
             try {
                 String json = ow.writeValueAsString(response);
-                kafkaProducerService.sendToKafka(json, response.getSurveyId(), "data-reviewpro-responses");
+                kafkaProducerService.sendToKafka(json, response.getSurveyId(), responsesTopic);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }

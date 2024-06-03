@@ -99,7 +99,6 @@ public class ResponseService {
             logger.info("Sending request to URL: {}", url);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
             logger.info("Response Service - Received response with status code: {}", response.getStatusCode());
-            logger.info(response.getBody());
             return response.getBody();
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             logger.error("HTTP error occurred: {}", e.getStatusCode());

@@ -51,12 +51,13 @@ spring:
     ssl.sslTruststoreLocation: ''
     ssl.sslTruststorePassword: ''
     topics:
-      client-topic: data-7rooms-client
-      reservation-topic: data-7rooms-reservation
-      venue-topic: data-7rooms-venue
-      venue-topic-deadletters: data-7rooms-venue-deadletters
-      handler-logs-topic: log-7rooms-handler
-      handler-deadletters-topic: data-7rooms-handler-deadletters
+      global-reviews-topic: data-reviewpro-globalreview
+      lodgings-topic: data-reviewpro-lodging
+      lodging-cqis-topic: data-reviewpro-lodgingcqi
+      lodging-scores-topic: data-reviewpro-lodgingScore
+      responses-topic: data-reviewpro-response
+      surveys-topic: data-reviewpro-survey
+
 server:
   port: 2020
 
